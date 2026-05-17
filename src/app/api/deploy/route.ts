@@ -113,7 +113,7 @@ EOF`,
             .from('orders')
             .update({ deployment_logs: logs })
             .eq('id', order.id)
-            .then(({ error }) => {
+            .then(({ error }: { error: any }) => {
               if (error) console.error('Throttled log update error:', error);
             });
         }
