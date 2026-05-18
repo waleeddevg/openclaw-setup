@@ -19,6 +19,7 @@ const badgeVariants = cva(
         in_progress: "border-blue-500/50 bg-blue-500/10 text-blue-500",
         completed: "border-green-500/50 bg-green-500/10 text-green-500",
         cancelled: "border-red-500/50 bg-red-500/10 text-red-500",
+        failed: "border-red-500/50 bg-red-500/10 text-red-500",
       },
     },
     defaultVariants: {
