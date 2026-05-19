@@ -20,16 +20,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No active subscription found. Please subscribe to a plan first." }, { status: 400 });
     }
 
-    const Stripe = require("stripe");
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const customerId = subscription.stripe_customer_id;
+    const apiKey = process.env.LEMONSQUEEZY_API_KEY;
 
-    console.log(`Creating billing portal session for customer: ${subscription.stripe_customer_id}`);
-    const session = await stripe.billingPortal.sessions.create({
-      customer: subscription.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard`,
+    if (!apiKey) {
+      throw new Error("Missing Lemon Squeezy API Key");
+    }
+
+    console.log(`Fetching Lemon Squeezy billing portal for customer: ${customerId}`);
+    
+    const response = await fetch(`https://api.lemonsqueezy.com/v1/customers/${customerId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Accept": "application/vnd.api+json",
+      }
     });
 
-    return NextResponse.json({ success: true, url: session.url });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.errors?.[0]?.detail || "Failed to fetch customer portal");
+    }
+
+    const portalUrl = data.data.attributes.urls.customer_portal;
+
+    return NextResponse.json({ success: true, url: portalUrl });
   } catch (error: any) {
     console.error("Billing portal error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
