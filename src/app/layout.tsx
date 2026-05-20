@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "ClawSetup AI — Professional OpenClaw Node Hosting",
   description: "Automated, secure, and production-ready hosting for your OpenClaw AI assistant nodes.",
+  keywords: ["OpenClaw", "AI hosting", "VPS", "automation", "ClawSetup", "Node orchestration"],
   icons: {
     icon: '/logo.png',
   },
@@ -17,8 +18,36 @@ export const metadata: Metadata = {
     title: "ClawSetup AI — Professional OpenClaw Node Hosting",
     description: "Automated, secure, and production-ready hosting for your OpenClaw AI assistant nodes.",
     type: "website",
+    url: "https://openclaw-setup-niem.vercel.app/",
+    images: [
+      {
+        url: "https://openclaw-setup-niem.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ClawSetup AI dashboard preview",
+      },
+    ],
   },
-}
+  twitter: {
+    card: "summary_large_image",
+    title: "ClawSetup AI — Professional OpenClaw Node Hosting",
+    description: "Automated, secure, and production-ready hosting for your OpenClaw AI assistant nodes.",
+    images: ["https://openclaw-setup-niem.vercel.app/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://openclaw-setup-niem.vercel.app/",
+  },
+};
 
 export default function RootLayout({
   children,
