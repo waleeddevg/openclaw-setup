@@ -14,7 +14,7 @@ const plans = [
   {
     id: "basic",
     name: "Developer Plan",
-    price: 9,
+    price: 8.99,
     period: "month",
     description: "Perfect for indie hackers & single-server setups",
     features: [
@@ -30,7 +30,7 @@ const plans = [
   {
     id: "pro",
     name: "Team Plan",
-    price: 19,
+    price: 35.99,
     period: "month",
     description: "Best for growing teams & micro SaaS tools",
     features: [
@@ -47,7 +47,7 @@ const plans = [
   {
     id: "business",
     name: "Agency Plan",
-    price: 39,
+    price: 125.99,
     period: "month",
     description: "Uncapped scaling for agencies & enterprises",
     features: [
@@ -222,7 +222,7 @@ export function Pricing() {
               <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M13.945 10.518L10.375 12l3.57 1.482L15.427 17l1.483-3.518L20.428 12l-3.518-1.482L15.427 7l-1.482 3.518zM4.143 12L7.66 10.518 9.143 7l1.483 3.518L14.143 12l-3.517 1.482L9.143 17l-1.483-3.518L4.143 12z" />
               </svg>
-              <span className="font-bold text-lg tracking-tighter">Stripe Subscriptions</span>
+              <span className="font-bold text-lg tracking-tighter">Lemon Squeezy Billing</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="p-2 bg-white/10 rounded-lg">

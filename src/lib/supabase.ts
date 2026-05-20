@@ -27,7 +27,7 @@ export async function createOrder(order: CreateOrderInput): Promise<Order | null
 }
 
 export async function getOrders(email?: string): Promise<Order[]> {
-  let query = supabase
+  let query = supabaseAdmin
     .from('orders')
     .select('*')
     .order('created_at', { ascending: false })
@@ -62,7 +62,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
 }
 
 export async function updateOrder(id: string, updates: UpdateOrderInput): Promise<Order | null> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('orders')
     .update({
       ...updates,
@@ -81,7 +81,7 @@ export async function updateOrder(id: string, updates: UpdateOrderInput): Promis
 }
 
 export async function deleteOrder(id: string): Promise<boolean> {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('orders')
     .delete()
     .eq('id', id)

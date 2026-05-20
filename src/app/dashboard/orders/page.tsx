@@ -138,7 +138,7 @@ export default function OrdersPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-white">All Orders</h1>
+        <h1 className="text-3xl font-bold text-white">My Orders</h1>
         <Button variant="outline" onClick={() => mutate()} className="gap-2">
           <RefreshCw className="w-4 h-4" />
           Refresh

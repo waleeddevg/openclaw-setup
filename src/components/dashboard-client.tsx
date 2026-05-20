@@ -175,12 +175,10 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-4xl font-black text-white tracking-tight mb-2">
-            {isAdmin ? "Global Infrastructure Dashboard" : "My Automated Servers"}
+            My Automated Servers
           </h1>
           <p className="text-zinc-500 font-medium">
-            {isAdmin 
-              ? "Comprehensive platform administration and all active user node deployments" 
-              : "Provision and orchestrate enterprise-grade OpenClaw AI servers instantly."}
+            Provision and orchestrate enterprise-grade OpenClaw AI servers instantly.
           </p>
         </div>
 
@@ -204,7 +202,7 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
           <Link href="/order">
             <Button
               variant="gradient"
-              disabled={slotsRemaining === 0 && !isAdmin}
+              disabled={slotsRemaining === 0}
               className="gap-2 h-11 shadow-lg shadow-violet-500/20"
             >
               <Plus className="w-4 h-4" />
@@ -215,7 +213,6 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
       </div>
 
       {/* Subscription Quota Slot Matrix */}
-      {!isAdmin && (
         <Card className="border-white/5 bg-zinc-950/50 backdrop-blur-xl relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4">
             <Badge variant="outline" className="border-violet-500/30 text-violet-400 bg-violet-950/10 font-bold uppercase tracking-wider px-3 py-1">
@@ -289,7 +286,6 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
             )}
           </CardContent>
         </Card>
-      )}
 
       {/* Quick Status Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -319,9 +315,6 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
               <CardTitle className="text-xl font-bold text-white">Active Server Nodes</CardTitle>
               <CardDescription className="text-zinc-500">Real-time control panel of your automated AI setups</CardDescription>
             </div>
-            {isAdmin && (
-              <Badge className="bg-rose-500/10 text-rose-400 border-rose-500/20">Admin View Mode</Badge>
-            )}
           </div>
         </CardHeader>
         <CardContent className="p-0">

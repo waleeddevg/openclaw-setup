@@ -24,9 +24,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
 
+    const userEmail = user.emailAddresses[0]?.emailAddress || "";
+
     let query = supabase
       .from('orders')
       .select('id, full_name, email, whatsapp, vps_provider, vps_ip, vps_username, ai_provider, plan, additional_notes, status, payment_status, amount_paid, deployment_logs, ai_url, created_at, updated_at')
+      .eq('email', userEmail)
       .order('created_at', { ascending: false });
 
     if (status && status !== 'all') {
