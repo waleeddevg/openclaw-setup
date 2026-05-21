@@ -64,6 +64,13 @@ export default function RootLayout({
           <link rel="preconnect" href="https://curious-gannet-57.clerk.accounts.dev" />
           <link rel="dns-prefetch" href="https://curious-gannet-57.clerk.accounts.dev" />
           <meta name="google-site-verification" content="BMKMftOQt0KLaTbL4m_xgbxfKMZfvoLTAzX8hwobTuI" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta name="author" content="ClawSetup AI Team" />
+          <link rel="canonical" href="https://openclaw-setup-niem.vercel.app/" />
+          <meta name="description" content="Automated, secure, and production-ready hosting for your OpenClaw AI assistant nodes." />
+          <meta name="keywords" content="OpenClaw, AI hosting, VPS, automation, ClawSetup, Node orchestration" />
+          <meta name="robots" content="index, follow" />
+          </head>
         </head>
         <body className={`${inter.className} bg-[#0a0a0a] text-white min-h-screen relative overflow-x-hidden`}>
           {/* Animated Background Blobs */}
