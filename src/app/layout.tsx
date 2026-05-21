@@ -63,6 +63,7 @@ export default function RootLayout({
         <head>
           <link rel="preconnect" href="https://curious-gannet-57.clerk.accounts.dev" />
           <link rel="dns-prefetch" href="https://curious-gannet-57.clerk.accounts.dev" />
+          <meta name="google-site-verification" content="BMKMftOQt0KLaTbL4m_xgbxfKMZfvoLTAzX8hwobTuI" />
         </head>
         <body className={`${inter.className} bg-[#0a0a0a] text-white min-h-screen relative overflow-x-hidden`}>
           {/* Animated Background Blobs */}
@@ -87,6 +88,7 @@ export default function RootLayout({
         <head>
           <link rel="preconnect" href="https://curious-gannet-57.clerk.accounts.dev" />
           <link rel="dns-prefetch" href="https://curious-gannet-57.clerk.accounts.dev" />
+          <meta name="google-site-verification" content="BMKMftOQt0KLaTbL4m_xgbxfKMZfvoLTAzX8hwobTuI" />
         </head>
         <body className={`${inter.className} bg-[#0a0a0a] text-white min-h-screen relative overflow-x-hidden`}>
           {/* Animated Background Blobs */}
