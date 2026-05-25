@@ -20,11 +20,11 @@ echo "Starting OpenClaw AI Setup for Provider: $PROVIDER..."
 
 # 1. System Update
 echo "Updating system packages..."
-apt-get update && apt-get upgrade -y
+DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -q
 
 # 2. Install Dependencies
 echo "Installing base dependencies..."
-apt-get install -y curl git build-essential software-properties-common
+DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl git build-essential software-properties-common
 
 # 3. Install Docker
 if ! command -v docker &> /dev/null; then
@@ -39,7 +39,7 @@ fi
 # 4. Install Node.js 22
 echo "Installing Node.js 22..."
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-apt-get install -y nodejs
+DEBIAN_FRONTEND=noninteractive apt-get install -y -q nodejs
 
 # 5. Clone OpenClaw
 echo "Cloning OpenClaw Repository..."

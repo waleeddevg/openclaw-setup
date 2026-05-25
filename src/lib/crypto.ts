@@ -8,8 +8,9 @@ function getEncryptionKey(): Buffer {
   const key = process.env.ENCRYPTION_KEY;
   if (!key) {
     throw new Error(
-      'ENCRYPTION_KEY environment variable is not set. ' +
-      'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"'
+      'CRITICAL: ENCRYPTION_KEY environment variable is not set in .env.local! ' +
+      'Please generate one using: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))" ' +
+      'and add it to your .env.local file.'
     );
   }
   // Key must be 32 bytes (64 hex characters) for AES-256
