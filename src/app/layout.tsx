@@ -70,7 +70,6 @@ export default function RootLayout({
           <meta name="description" content="Automated, secure, and production-ready hosting for your OpenClaw AI assistant nodes." />
           <meta name="keywords" content="OpenClaw, AI hosting, VPS, automation, ClawSetup, Node orchestration" />
           <meta name="robots" content="index, follow" />
-          </head>
         </head>
         <body className={`${inter.className} bg-[#0a0a0a] text-white min-h-screen relative overflow-x-hidden`}>
           {/* Animated Background Blobs */}
