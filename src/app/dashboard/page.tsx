@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   // 1. Fetch deployments list (Always show only the logged-in user's personal orders here)
   const orders = await getOrders(userEmail)
 
-  // 2. Fetch active Stripe slot subscription details for quota progress calculation
+  // 2. Fetch active subscription details for quota progress calculation
   const subscription = await getSubscription(userEmail)
 
   return (

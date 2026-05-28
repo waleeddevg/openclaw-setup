@@ -109,7 +109,7 @@ export function Pricing() {
       const data = await res.json()
 
       if (res.ok && data.url) {
-        window.location.href = data.url // Direct redirect to Stripe Checkout
+        window.location.href = data.url // Direct redirect to Lemon Squeezy Checkout
       } else {
         toast.error(data.error || "Failed to initiate payment. Please try again.")
       }

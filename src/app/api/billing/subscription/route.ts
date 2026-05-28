@@ -18,22 +18,28 @@ export async function GET(request: NextRequest) {
 
     let subscription = await getSubscription(userEmail);
 
-    // Development Fallback: Auto-provision a mock subscription to make local testing flawless!
+    // Development Fallback: Auto-provision a mock subscription for local testing only
     if (!subscription || subscription.status !== "active") {
       const isDev = process.env.NODE_ENV === "development";
-      const isLocalHost = request.nextUrl.hostname === "localhost" || request.nextUrl.hostname === "127.0.0.1";
-      
+      const isLocalHost =
+        request.nextUrl.hostname === "localhost" ||
+        request.nextUrl.hostname === "127.0.0.1";
+
       if (isDev || isLocalHost) {
-        console.log(`[Dev Fallback] Auto-provisioning mock active subscription for local testing email: ${userEmail}`);
+        console.log(
+          `[Dev Fallback] Auto-provisioning mock active subscription for: ${userEmail}`
+        );
         const mockSub = {
           email: userEmail,
-          plan: "pro", // Default to pro for 3 testing slots
+          plan: "pro",
           status: "active",
-          stripe_subscription_id: "sub_mock_" + Math.random().toString(36).substr(2, 9),
-          stripe_customer_id: "cus_mock_" + Math.random().toString(36).substr(2, 9),
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+          ls_subscription_id: "sub_mock_" + Math.random().toString(36).substr(2, 9),
+          ls_customer_id: "cus_mock_" + Math.random().toString(36).substr(2, 9),
+          current_period_end: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000
+          ).toISOString(),
         };
-        
+
         const savedSub = await upsertSubscription(mockSub);
         if (savedSub) {
           subscription = savedSub;
@@ -43,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ subscription });
   } catch (error: any) {
-    console.error("Subscription retrieval error:", error);
+    console.error("[Subscription API] Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

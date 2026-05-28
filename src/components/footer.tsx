@@ -152,7 +152,7 @@ export function Footer() {
           <div className="flex items-center gap-6 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
             <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" className="h-4" />
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Lemon Squeezy</span>
             <div className="h-4 w-px bg-zinc-800" />
             <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Secure SSL</span>
           </div>

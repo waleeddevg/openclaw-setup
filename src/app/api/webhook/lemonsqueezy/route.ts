@@ -1,154 +1,138 @@
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+import { createHmac } from "crypto";
 import { createClient } from "@supabase/supabase-js";
-import { deployOrder } from "@/lib/deployment";
 
-const webhookSecret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET!;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-async function handleSubscriptionUpdate(subscriptionId: string, customData: any, status: string, customerId: string, currentPeriodEnd: string) {
-  console.log(`Processing Lemon Squeezy subscription sync for ID: ${subscriptionId}`);
-  
-  const email = customData?.email;
-  const plan = customData?.plan || "basic";
-  
-  // In Lemon Squeezy, 'active' and 'on_trial' are good statuses. We map them to 'active'.
-  const mappedStatus = ['active', 'on_trial'].includes(status) ? "active" : "inactive";
+// Map Lemon Squeezy variant IDs → plan names
+const VARIANT_TO_PLAN: Record<string, string> = {
+  "1674455": "basic",
+  "1674595": "pro",
+  "1674601": "business",
+};
 
-  if (email) {
-    const { error } = await supabase
-      .from("subscriptions")
-      .upsert({
+function verifySignature(rawBody: string, signature: string, secret: string): boolean {
+  const hash = createHmac("sha256", secret).update(rawBody).digest("hex");
+  return hash === signature;
+}
+
+async function syncSubscription(eventName: string, data: any, customData: any) {
+  const attrs = data.attributes;
+  const lsSubscriptionId = String(data.id);
+  const lsCustomerId = String(attrs.customer_id);
+  const variantId = String(attrs.variant_id);
+  const plan = VARIANT_TO_PLAN[variantId] || "basic";
+
+  // Resolve email: prefer custom_data, fallback to user_email from LS
+  const email = customData?.email || attrs.user_email;
+
+  if (!email) {
+    console.error(`[LS Webhook] Could not resolve email for subscription ${lsSubscriptionId}`);
+    return;
+  }
+
+  const status = ["active", "on_trial"].includes(attrs.status) ? "active" : "inactive";
+  const renewsAt = attrs.renews_at || attrs.ends_at || null;
+
+  console.log(`[LS Webhook] Syncing subscription for ${email}: plan=${plan}, status=${status}, event=${eventName}`);
+
+  const { error } = await supabase
+    .from("subscriptions")
+    .upsert(
+      {
         email,
         plan,
-        status: mappedStatus,
-        stripe_subscription_id: subscriptionId, // re-using the column name for simplicity
-        stripe_customer_id: customerId, // re-using the column name
-        current_period_end: currentPeriodEnd,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: "email"
-      });
+        status,
+        ls_subscription_id: lsSubscriptionId,
+        ls_customer_id: lsCustomerId,
+        current_period_end: renewsAt,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "email" }
+    );
 
-    if (error) {
-      console.error(`Failed to upsert subscription in Supabase for ${email}:`, error);
-    } else {
-      console.log(`Synced subscription to Supabase for ${email}: plan=${plan}, status=${mappedStatus}`);
-    }
+  if (error) {
+    console.error(`[LS Webhook] Failed to upsert subscription for ${email}:`, error);
   } else {
-    console.error(`Could not resolve custom email for subscription: ${subscriptionId}`);
+    console.log(`[LS Webhook] ✅ Subscription synced for ${email}`);
+  }
+}
+
+async function cancelSubscription(data: any) {
+  const attrs = data.attributes;
+  const email = attrs.user_email;
+
+  if (!email) {
+    console.error("[LS Webhook] Cannot cancel subscription: missing email");
+    return;
+  }
+
+  console.log(`[LS Webhook] Cancelling subscription for ${email}`);
+
+  const { error } = await supabase
+    .from("subscriptions")
+    .update({
+      status: "canceled",
+      plan: "free",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("email", email);
+
+  if (error) {
+    console.error(`[LS Webhook] Failed to cancel subscription for ${email}:`, error);
+  } else {
+    console.log(`[LS Webhook] ✅ Subscription cancelled for ${email}`);
   }
 }
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
-  const signatureHeader = req.headers.get("x-signature") || "";
+  const signature = req.headers.get("x-signature") || "";
+  const webhookSecret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
 
-  // Verify Signature
-  try {
-    const hmac = crypto.createHmac("sha256", webhookSecret);
-    const digest = Buffer.from(hmac.update(rawBody).digest("hex"), "utf8");
-    const signature = Buffer.from(signatureHeader, "utf8");
-
-    if (!crypto.timingSafeEqual(digest, signature)) {
-      throw new Error("Invalid signature.");
-    }
-  } catch (err: any) {
-    console.error("Lemon Squeezy Webhook Verification Failed:", err.message);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  if (!webhookSecret) {
+    console.error("[LS Webhook] Missing LEMONSQUEEZY_WEBHOOK_SECRET");
+    return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
-  const payload = JSON.parse(rawBody);
-  const eventName = payload.meta.event_name;
-  const obj = payload.data.attributes;
+  // Verify signature
+  if (!verifySignature(rawBody, signature, webhookSecret)) {
+    console.warn("[LS Webhook] Invalid signature — possible spoofed request");
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
 
-  console.log(`Lemon Squeezy webhook event received: ${eventName}`);
-
+  let payload: any;
   try {
-    switch (eventName) {
-      case "subscription_created":
-      case "subscription_updated": {
-        const subscriptionId = payload.data.id;
-        const customerId = obj.customer_id.toString();
-        const customData = payload.meta.custom_data;
-        const status = obj.status;
-        const currentPeriodEnd = obj.renews_at;
+    payload = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-        await handleSubscriptionUpdate(subscriptionId, customData, status, customerId, currentPeriodEnd);
-        
-        // If it's a new subscription creation, we should also update an order and deploy it.
-        // We'll find the pending order for this email and plan, and mark it in_progress to trigger deployment.
-        if (eventName === "subscription_created" && customData?.email) {
-            const { data: orders } = await supabase
-              .from("orders")
-              .select("id")
-              .eq("email", customData.email)
-              .eq("status", "pending")
-              .order("created_at", { ascending: false })
-              .limit(1);
+  const eventName: string = payload.meta?.event_name;
+  const customData = payload.meta?.custom_data;
+  const data = payload.data;
 
-            if (orders && orders.length > 0) {
-              const orderId = orders[0].id;
-              console.log(`Payment successful for order: ${orderId}`);
+  console.log(`[LS Webhook] Event received: ${eventName}`);
 
-              await supabase
-                .from("orders")
-                .update({ 
-                  payment_status: "paid",
-                  status: "in_progress", 
-                  amount_paid: obj.total / 100 
-                })
-                .eq("id", orderId);
+  switch (eventName) {
+    case "subscription_created":
+    case "subscription_updated":
+    case "subscription_resumed":
+    case "subscription_unpaused":
+      await syncSubscription(eventName, data, customData);
+      break;
 
-              // Trigger automated deployment
-              deployOrder(orderId).catch((err) => {
-                console.error(`Post-payment deployment trigger failed for ${orderId}:`, err);
-              });
-            }
-        }
+    case "subscription_cancelled":
+    case "subscription_expired":
+    case "subscription_paused":
+      await cancelSubscription(data);
+      break;
 
-        break;
-      }
-      
-      case "subscription_cancelled":
-      case "subscription_expired": {
-        const customData = payload.meta.custom_data;
-        const email = customData?.email;
-        
-        if (email) {
-          const { error } = await supabase
-            .from("subscriptions")
-            .update({
-              status: "canceled",
-              plan: "free",
-              updated_at: new Date().toISOString()
-            })
-            .eq("email", email);
-
-          if (error) {
-            console.error(`Failed to cancel subscription for ${email} in Supabase:`, error);
-          } else {
-            console.log(`Subscription successfully canceled for ${email}`);
-          }
-        }
-        break;
-      }
-
-      default:
-        console.log(`Unhandled Lemon Squeezy event type ${eventName}`);
-    }
-  } catch (error) {
-    console.error("Webhook processing error:", error);
-    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
+    default:
+      console.log(`[LS Webhook] Unhandled event: ${eventName}`);
   }
 
   return NextResponse.json({ received: true });
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};

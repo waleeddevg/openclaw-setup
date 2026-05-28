@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Trigger automated background deployment instantly!
-    console.log(`Bypassing Stripe Checkout! Triggering direct deployment for subscription order: ${order.id}`);
+    console.log(`Bypassing checkout flow! Triggering direct deployment for subscription order: ${order.id}`);
     deployOrder(order.id).catch((err) => {
       console.error(`Subscription direct deployment trigger failed for ${order.id}:`, err);
     })

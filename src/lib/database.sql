@@ -48,6 +48,28 @@ CREATE POLICY "Allow users to read own orders" ON orders
   FOR SELECT TO public
   USING (email = current_setting('request.jwt.claims', true)::json->>'email');
 
+-- Subscriptions table (Lemon Squeezy billing)
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  plan TEXT NOT NULL DEFAULT 'free',
+  status TEXT NOT NULL DEFAULT 'inactive',
+  ls_subscription_id TEXT,
+  ls_customer_id TEXT,
+  -- Legacy Stripe fields (kept for backward compatibility)
+  stripe_subscription_id TEXT,
+  stripe_customer_id TEXT,
+  current_period_end TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Index on email for fast subscription lookups
+CREATE INDEX IF NOT EXISTS idx_subscriptions_email ON subscriptions(email);
+
+-- Enable RLS on subscriptions
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+
 -- Note: Admin access is handled through the service role key in server components
 -- The service role key bypasses RLS policies
 

@@ -29,6 +29,7 @@ interface DashboardClientProps {
   subscription: {
     plan: string
     status: string
+    ls_customer_id?: string
     stripe_customer_id?: string
   } | null
   userEmail: string
@@ -81,7 +82,7 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
           if (attempts >= 10) {
             setIsSyncing(false)
             clearInterval(interval)
-            toast.error("Stripe is taking a bit longer to sync. Please refresh the page manually in a few seconds.", {
+            toast.error("Lemon Squeezy is taking a bit longer to sync. Please refresh the page manually in a few seconds.", {
               duration: 5000
             })
           }
@@ -140,9 +141,10 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
     }
   }
 
-  // 3. Handle Stripe customer portal redirect
+  // 3. Handle billing portal redirect (Lemon Squeezy)
   const handleManageBilling = async () => {
-    if (!subscription || !subscription.stripe_customer_id) {
+    const customerId = subscription?.ls_customer_id || subscription?.stripe_customer_id
+    if (!subscription || !customerId) {
       toast.error("You do not have an active billing history. Subscribe to a plan first!")
       return
     }
@@ -234,10 +236,10 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
                 <div className="space-y-1">
                   <h4 className="font-bold text-white text-base flex items-center gap-2">
                     <Loader2 className="w-5 h-5 animate-spin text-violet-400" />
-                    Syncing subscription status with Stripe...
+                    Syncing subscription status...
                   </h4>
                   <p className="text-zinc-400 text-xs leading-relaxed max-w-lg">
-                    Confirming payment confirmation and provisioning your server slot quota. This usually takes 2-3 seconds...
+                    Confirming payment and provisioning your server slot quota. This usually takes 2-3 seconds...
                   </p>
                 </div>
               </div>

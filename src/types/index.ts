@@ -78,6 +78,8 @@ export interface Subscription {
   email: string
   plan: 'free' | 'basic' | 'pro' | 'business'
   status: 'active' | 'inactive' | 'canceled'
+  ls_subscription_id?: string
+  ls_customer_id?: string
   stripe_subscription_id?: string
   stripe_customer_id?: string
   current_period_end?: string

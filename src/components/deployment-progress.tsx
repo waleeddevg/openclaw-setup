@@ -78,7 +78,7 @@ export function DeploymentProgress({ orderId }: DeploymentProgressProps) {
           </div>
           <div className="flex-1">
             <h4 className="text-sm font-semibold text-yellow-500 uppercase tracking-wider">Awaiting Payment Confirmation</h4>
-            <p className="text-xs text-zinc-400">Deployment will begin automatically once Stripe confirms your transaction.</p>
+            <p className="text-xs text-zinc-400">Deployment will begin automatically once Lemon Squeezy confirms your transaction.</p>
           </div>
           <Button size="sm" variant="outline" className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => window.location.reload()}>
             Refresh Status
