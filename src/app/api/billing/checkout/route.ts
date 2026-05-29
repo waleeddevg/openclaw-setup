@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
     // GUMROAD PRODUCT LINKS
     // Yahan par aapne apne Gumroad ke products ke link daalne hain
     const gumroadLinks: Record<string, string> = {
-      basic: process.env.GUMROAD_BASIC_LINK || "https://gumroad.com/l/your_basic_plan",
-      pro: process.env.GUMROAD_PRO_LINK || "https://gumroad.com/l/your_pro_plan",
-      business: process.env.GUMROAD_BUSINESS_LINK || "https://gumroad.com/l/your_business_plan",
+      basic: process.env.GUMROAD_BASIC_LINK || "https://devwaleed.gumroad.com/l/srappx",
+      pro: process.env.GUMROAD_PRO_LINK || "https://devwaleed.gumroad.com/l/srappx",
+      business: process.env.GUMROAD_BUSINESS_LINK || "https://devwaleed.gumroad.com/l/srappx",
     };
 
     const checkoutUrl = new URL(gumroadLinks[plan]);
