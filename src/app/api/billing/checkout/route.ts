@@ -18,78 +18,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User email not found" }, { status: 400 });
     }
 
-    const apiKey = process.env.LEMONSQUEEZY_API_KEY;
-    if (!apiKey) {
-      throw new Error("Missing Lemon Squeezy API Key");
-    }
-
-    const storeId = "380349";
-
-    const variantIds: Record<string, string> = {
-      basic: "1674455",
-      pro: "1674595",
-      business: "1674601",
+    // GUMROAD PRODUCT LINKS
+    // Yahan par aapne apne Gumroad ke products ke link daalne hain
+    const gumroadLinks: Record<string, string> = {
+      basic: process.env.GUMROAD_BASIC_LINK || "https://gumroad.com/l/your_basic_plan",
+      pro: process.env.GUMROAD_PRO_LINK || "https://gumroad.com/l/your_pro_plan",
+      business: process.env.GUMROAD_BUSINESS_LINK || "https://gumroad.com/l/your_business_plan",
     };
 
-    const variantId = variantIds[plan];
+    const checkoutUrl = new URL(gumroadLinks[plan]);
+    
+    // Pass the user's email to Gumroad so they don't have to type it again
+    checkoutUrl.searchParams.append("email", userEmail);
+    // Pass the user's Clerk ID so we know who paid when the webhook hits
+    checkoutUrl.searchParams.append("custom_user_id", user.id);
 
-    console.log(`Creating Lemon Squeezy checkout for email ${userEmail}, plan ${plan}, variant ${variantId}`);
+    console.log(`Redirecting to Gumroad checkout: ${checkoutUrl.toString()}`);
 
-    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard?success=true`;
-
-    const response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Accept": "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json",
-      },
-      body: JSON.stringify({
-        data: {
-          type: "checkouts",
-          attributes: {
-            checkout_data: {
-              email: userEmail,
-              custom: {
-                email: userEmail,
-                plan: plan
-              }
-            },
-            product_options: {
-              redirect_url: redirectUrl,
-              receipt_button_text: "Go to Dashboard",
-              receipt_link_url: redirectUrl
-            }
-          },
-          relationships: {
-            store: {
-              data: {
-                type: "stores",
-                id: storeId
-              }
-            },
-            variant: {
-              data: {
-                type: "variants",
-                id: variantId.toString()
-              }
-            }
-          }
-        }
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Lemon Squeezy checkout error details:", data);
-      throw new Error(data.errors?.[0]?.detail || "Failed to create checkout");
-    }
-
-    const checkoutUrl = data.data.attributes.url;
-    console.log(`Lemon Squeezy checkout created: ${checkoutUrl}`);
-
-    return NextResponse.json({ success: true, url: checkoutUrl });
+    return NextResponse.json({ success: true, url: checkoutUrl.toString() });
   } catch (error: any) {
     console.error("Billing checkout error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
