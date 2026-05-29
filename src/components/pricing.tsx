@@ -13,53 +13,21 @@ import { toast } from "sonner"
 const plans = [
   {
     id: "basic",
-    name: "Developer Plan",
-    price: 8.99,
+    name: "Developer Pro Plan",
+    price: 9,
     period: "month",
-    description: "Perfect for indie hackers & single-server setups",
+    description: "Everything you need to deploy and manage your automated OpenClaw AI nodes",
     features: [
-      "Host up to 1 Active Node VPS",
+      "Host Unlimited Active Node VPS",
       "Automated OpenClaw AI setups",
       "Automatic SSL certificate setup",
-      "Standard security firewall hardening",
-      "Standard email support",
-    ],
-    cta: "Subscribe to Developer",
-    popular: false,
-  },
-  {
-    id: "pro",
-    name: "Team Plan",
-    price: 35.99,
-    period: "month",
-    description: "Best for growing teams & micro SaaS tools",
-    features: [
-      "Host up to 3 Active Nodes concurrently",
       "Standard & high-fidelity SSH setup logs",
       "SSL reverse proxy + Nginx automation",
-      "Custom domain & subdomains configuration",
+      "Standard security firewall hardening",
       "Priority WhatsApp & email support",
-      "Multi-AI Model Provider integrations",
     ],
-    cta: "Subscribe to Team",
+    cta: "Get Instant Access",
     popular: true,
-  },
-  {
-    id: "business",
-    name: "Agency Plan",
-    price: 125.99,
-    period: "month",
-    description: "Uncapped scaling for agencies & enterprises",
-    features: [
-      "Host up to 10 Active Nodes concurrently",
-      "Zero limits background deployments",
-      "Automatic weekly configuration backups",
-      "Priority load-balancing SSH tunnels",
-      "24/7 Server uptime metrics and logs",
-      "Dedicated automation account manager",
-    ],
-    cta: "Subscribe to Agency",
-    popular: false,
   },
 ]
 
@@ -109,7 +77,7 @@ export function Pricing() {
       const data = await res.json()
 
       if (res.ok && data.url) {
-        window.location.href = data.url // Direct redirect to Lemon Squeezy Checkout
+        window.location.href = data.url // Direct redirect to Checkout
       } else {
         toast.error(data.error || "Failed to initiate payment. Please try again.")
       }
@@ -147,10 +115,10 @@ export function Pricing() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10"
+          className="flex justify-center relative z-10"
         >
           {plans.map((plan, index) => (
-            <motion.div key={index} variants={itemVariants} className="relative group">
+            <motion.div key={index} variants={itemVariants} className="relative group max-w-md w-full">
               {plan.popular && (
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
               )}
@@ -222,7 +190,7 @@ export function Pricing() {
               <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M13.945 10.518L10.375 12l3.57 1.482L15.427 17l1.483-3.518L20.428 12l-3.518-1.482L15.427 7l-1.482 3.518zM4.143 12L7.66 10.518 9.143 7l1.483 3.518L14.143 12l-3.517 1.482L9.143 17l-1.483-3.518L4.143 12z" />
               </svg>
-              <span className="font-bold text-lg tracking-tighter">Lemon Squeezy Billing</span>
+              <span className="font-bold text-lg tracking-tighter">Gumroad Billing</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="p-2 bg-white/10 rounded-lg">
