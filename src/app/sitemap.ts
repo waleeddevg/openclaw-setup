@@ -1,7 +1,10 @@
 import { MetadataRoute } from "next"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://clawsetup.ai"
+  let baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://clawsetup.ai"
+  if (baseUrl.endsWith("/")) {
+    baseUrl = baseUrl.slice(0, -1)
+  }
 
   return [
     {
