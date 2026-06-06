@@ -1,7 +1,7 @@
 import { SSHService } from '@/lib/ssh-service';
 import { decrypt } from '@/lib/crypto';
 import { createClient } from "@supabase/supabase-js"
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -49,38 +49,44 @@ export async function deployOrder(orderId: string) {
     await ssh.connect(order.vps_ip, order.vps_username, password);
     await updateStatus('in_progress', 'Connected successfully!');
 
-    // Read script content
+    // Read script content (async — does not block event loop)
     const scriptPath = path.join(process.cwd(), 'src/lib/scripts/setup-openclaw.sh');
-    let scriptContent = fs.readFileSync(scriptPath, 'utf8');
+    let scriptContent = await fs.readFile(scriptPath, 'utf8');
 
     await updateStatus('in_progress', 'Initializing system update and dependencies installation...');
     
-    // Buffer for logs to avoid too many DB writes
     let logBuffer = [...logs];
     let lastUpdate = Date.now();
 
-    // Execute script
+    // FIX: Pass user-controlled values as env vars — never interpolate into shell strings
     const provider = order.ai_provider || 'openai';
-    const result = await ssh.execute(`bash -s -- "${apiKey}" "${order.vps_ip}" "${provider}" << 'EOF'
+    const result = await ssh.executeWithEnv(
+      `bash << 'EOF'
 ${scriptContent}
-EOF`, 
-    async (stdout) => {
-      // Split stdout by lines and add to buffer
-      const lines = stdout.split('\n').filter(l => l.trim().length > 0);
-      const timestamp = new Date().toISOString();
-      lines.forEach(line => {
-        logBuffer.push(`[${timestamp}] ${line}`);
-      });
+EOF`,
+      {
+        CLAWSETUP_API_KEY: apiKey,
+        CLAWSETUP_VPS_IP: order.vps_ip,
+        CLAWSETUP_PROVIDER: provider,
+      },
+      async (stdout) => {
+        const lines = stdout.split('\n').filter(l => l.trim().length > 0);
+        const timestamp = new Date().toISOString();
+        lines.forEach(line => {
+          // Cap logs at 500 entries to prevent unbounded DB writes
+          if (logBuffer.length < 500) logBuffer.push(`[${timestamp}] ${line}`);
+        });
 
-      // Update DB if 2 seconds passed since last update
-      if (Date.now() - lastUpdate > 2000) {
-        lastUpdate = Date.now();
-        await supabase
-          .from('orders')
-          .update({ deployment_logs: logBuffer })
-          .eq('id', order.id);
+        // Update DB if 2 seconds passed since last update
+        if (Date.now() - lastUpdate > 2000) {
+          lastUpdate = Date.now();
+          await supabase
+            .from('orders')
+            .update({ deployment_logs: logBuffer })
+            .eq('id', order.id);
+        }
       }
-    });
+    );
 
     if (result.code !== 0) {
       throw new Error(`Deployment script failed: ${result.stderr}`);

@@ -23,7 +23,7 @@ export default function Home() {
                 "operatingSystem": "Linux",
                 "offers": {
                   "@type": "Offer",
-                  "price": "0",
+                  "price": "9.00",
                   "priceCurrency": "USD"
                 },
                 "description": "Automated, secure, and production-ready hosting and deployment for OpenClaw AI assistant nodes."

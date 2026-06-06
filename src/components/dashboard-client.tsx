@@ -45,6 +45,7 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
 
   // 1. Quota Slot calculation
   const limits: Record<string, number> = {
+    free: 5,
     basic: 1,
     pro: 3,
     business: 10,
@@ -52,7 +53,7 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
 
   const isSubActive = activeSub?.status === "active"
   const plan = isSubActive ? activeSub.plan : "free"
-  const limit = isSubActive ? (limits[activeSub.plan] || 0) : 0
+  const limit = isSubActive ? (limits[activeSub.plan] || 5) : 5
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -185,7 +186,7 @@ export function DashboardClient({ initialOrders, subscription, userEmail, isAdmi
         </div>
 
         <div className="flex items-center gap-3">
-          {isSubActive && (
+          {isSubActive && plan !== "free" && (
             <Button
               onClick={handleManageBilling}
               disabled={loadingPortal}

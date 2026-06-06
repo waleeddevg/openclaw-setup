@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -15,7 +15,11 @@ const VARIANT_TO_PLAN: Record<string, string> = {
 
 function verifySignature(rawBody: string, signature: string, secret: string): boolean {
   const hash = createHmac("sha256", secret).update(rawBody).digest("hex");
-  return hash === signature;
+  // Use timingSafeEqual to prevent timing attacks (brute-force via response time)
+  const hashBuffer = Buffer.from(hash, "hex");
+  const sigBuffer = Buffer.from(signature, "hex");
+  if (hashBuffer.length !== sigBuffer.length) return false;
+  return timingSafeEqual(hashBuffer, sigBuffer);
 }
 
 async function syncSubscription(eventName: string, data: any, customData: any) {

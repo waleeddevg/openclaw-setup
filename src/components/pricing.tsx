@@ -12,21 +12,21 @@ import { toast } from "sonner"
 
 const plans = [
   {
-    id: "basic",
-    name: "Developer Pro Plan",
-    price: 9,
-    period: "month",
-    description: "Everything you need to deploy and manage your automated OpenClaw AI nodes",
+    id: "free",
+    name: "Public Beta Plan",
+    price: 0,
+    period: "forever",
+    description: "Deploy and manage your automated OpenClaw AI nodes during our public beta.",
     features: [
-      "Host Unlimited Active Node VPS",
-      "Automated OpenClaw AI setups",
+      "Host up to 5 Active Node VPS",
+      "Automated OpenClaw setups",
       "Automatic SSL certificate setup",
-      "Standard & high-fidelity SSH setup logs",
-      "SSL reverse proxy + Nginx automation",
-      "Standard security firewall hardening",
-      "Priority WhatsApp & email support",
+      "Standard SSH setup logs",
+      "Nginx reverse proxy automation",
+      "Basic security firewall setup",
+      "Community support via WhatsApp",
     ],
-    cta: "Get Instant Access",
+    cta: "Deploy Node For Free",
     popular: true,
   },
 ]
@@ -55,38 +55,14 @@ const itemVariants = {
 export function Pricing() {
   const { isSignedIn } = useUser()
   const router = useRouter()
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
 
-  const handlePlanClick = async (planId: string) => {
+  const handlePlanClick = (planId: string) => {
     if (!isSignedIn) {
-      toast.info("Please sign in or sign up first to select a hosting plan.")
-      router.push("/sign-in")
+      toast.info("Please sign in or sign up first to get started.")
+      router.push("/sign-in?redirect_url=/order")
       return
     }
-
-    setLoadingPlan(planId)
-    toast.info("Preparing secure checkout...")
-
-    try {
-      const res = await fetch("/api/billing/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planId }),
-      })
-
-      const data = await res.json()
-
-      if (res.ok && data.url) {
-        window.location.href = data.url // Direct redirect to Checkout
-      } else {
-        toast.error(data.error || "Failed to initiate payment. Please try again.")
-      }
-    } catch (err) {
-      console.error(err)
-      toast.error("An error occurred during checkout setup.")
-    } finally {
-      setLoadingPlan(null)
-    }
+    router.push("/order")
   }
 
   return (
@@ -101,11 +77,11 @@ export function Pricing() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            <span className="text-white">Professional, Slot-Based </span>
-            <span className="text-gradient">Monthly Hosting Tiers</span>
+            <span className="text-white">Public Beta &mdash; </span>
+            <span className="text-gradient">100% Free Setup</span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            Subscribe to a slot quota below. Zero hosting costs for nodes—deploy up to your slot limit on your own VPS instantly.
+            Deploy your OpenClaw AI assistant to your own VPS instantly. No payment card required.
           </p>
         </motion.div>
 
@@ -133,7 +109,7 @@ export function Pricing() {
                   <div className="absolute top-0 right-0 p-4">
                     <Badge variant="default" className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-none shadow-lg shadow-violet-500/20">
                       <Star className="w-3 h-3 mr-1 fill-current" />
-                      Best Value
+                      Free Beta
                     </Badge>
                   </div>
                 )}
@@ -143,8 +119,8 @@ export function Pricing() {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-8">
-                    <span className="text-5xl font-extrabold text-white tracking-tight">${plan.price}</span>
-                    <span className="text-zinc-500 ml-1 text-sm font-medium">/ month</span>
+                    <span className="text-5xl font-extrabold text-white tracking-tight">Free</span>
+                    <span className="text-zinc-500 ml-1 text-sm font-medium">/ forever</span>
                   </div>
 
                   <ul className="space-y-4 mb-10">
@@ -162,14 +138,10 @@ export function Pricing() {
                     onClick={() => handlePlanClick(plan.id)}
                     variant={plan.popular ? "gradient" : "outline"}
                     size="lg"
-                    disabled={loadingPlan === plan.id}
                     className={`w-full rounded-xl font-bold h-12 shadow-xl transition-all ${
                       plan.popular ? 'shadow-violet-500/20 hover:shadow-violet-500/40' : 'border-white/10 hover:bg-white/5'
                     }`}
                   >
-                    {loadingPlan === plan.id ? (
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    ) : null}
                     {plan.cta}
                   </Button>
                 </CardContent>
@@ -188,9 +160,9 @@ export function Pricing() {
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
             <div className="flex items-center gap-2">
               <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M13.945 10.518L10.375 12l3.57 1.482L15.427 17l1.483-3.518L20.428 12l-3.518-1.482L15.427 7l-1.482 3.518zM4.143 12L7.66 10.518 9.143 7l1.483 3.518L14.143 12l-3.517 1.482L9.143 17l-1.483-3.518L4.143 12z" />
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
               </svg>
-              <span className="font-bold text-lg tracking-tighter">Gumroad Billing</span>
+              <span className="font-bold text-lg tracking-tighter">No Card Required</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="p-2 bg-white/10 rounded-lg">
@@ -211,13 +183,13 @@ export function Pricing() {
           
           <div className="max-w-md text-center space-y-2">
             <p className="text-zinc-400 text-sm font-medium italic">
-              "Frictionless subscription billing model is perfect. Creating new nodes takes 0-clicks for payment!"
+              "Super clean platform. No pricing barrier. Deployed my OpenClaw agent in under 5 minutes without writing a single bash script."
             </p>
             <p className="text-xs text-zinc-600 font-bold uppercase tracking-widest">— Professional Developer</p>
           </div>
 
           <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold">
-            Guaranteed 100% Secure Transaction & Deployment
+            Guaranteed 100% Free & Secure Deployment
           </p>
         </motion.div>
       </div>

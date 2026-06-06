@@ -9,7 +9,7 @@ import { redirect } from "next/navigation"
 
 export const metadata = {
   title: "Order Setup - ClawSetup AI",
-  description: "Submit your AI assistant setup order. We'll have you up and running in 24 hours.",
+  description: "Submit your VPS details and our automated system will have your OpenClaw AI assistant up and running in minutes.",
 }
 
 export default async function OrderPage() {
@@ -40,9 +40,9 @@ export default async function OrderPage() {
           {/* Trust Indicators */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
             {[
-              { icon: Sparkles, title: "Expert Setup", desc: "Professionally configured" },
-              { icon: Shield, title: "Secure & Safe", desc: "Your data is protected" },
-              { icon: Clock, title: "24h Delivery", desc: "Quick turnaround time" },
+              { icon: Sparkles, title: "Automated Setup", desc: "Fully automated deployment" },
+              { icon: Shield, title: "Secure & Safe", desc: "AES-256 encrypted credentials" },
+              { icon: Clock, title: "~5 Min Delivery", desc: "Live in under 5 minutes" },
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-3 bg-white/5 rounded-xl p-4">
                 <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">

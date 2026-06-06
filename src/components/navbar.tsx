@@ -4,9 +4,10 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Zap } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
+import { useUser } from "@clerk/nextjs"
+import { UserButton } from "@clerk/nextjs"
 
 const navLinks = [
   { href: "/#features", label: "Features" },
@@ -17,6 +18,7 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const { isSignedIn, isLoaded } = useUser()
 
   return (
     <motion.header
@@ -55,32 +57,32 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <SignedIn>
+              {isSignedIn && (
                 <Link
                   href="/dashboard"
                   className="text-sm font-bold text-violet-400 hover:text-violet-300 transition-colors"
                 >
                   Dashboard
                 </Link>
-              </SignedIn>
+              )}
             </div>
 
-            {/* CTA Buttons */}
-            <div className="hidden md:flex items-center gap-4">
-              <SignedOut>
-                <Link href="/sign-in">
-                  <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 px-6 font-bold uppercase tracking-widest text-[10px]">
-                    Log In
-                  </Button>
-                </Link>
-                <Link href="/sign-up">
-                  <Button variant="gradient" className="rounded-xl px-8 font-black uppercase tracking-tighter shadow-[0_10px_30px_rgba(139,92,246,0.3)] hover:scale-105 transition-all">
-                    Get Started
-                  </Button>
-                </Link>
-              </SignedOut>
-
-              <SignedIn>
+            {/* Desktop CTA Buttons — always renders, no Clerk SSR flicker */}
+            <div className="hidden md:flex items-center gap-3">
+              {!isLoaded || !isSignedIn ? (
+                <>
+                  <Link href="/sign-in">
+                    <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 px-6 font-bold uppercase tracking-widest text-[10px]">
+                      Log In
+                    </Button>
+                  </Link>
+                  <Link href="/sign-up">
+                    <Button variant="gradient" className="rounded-xl px-8 font-black shadow-[0_10px_30px_rgba(139,92,246,0.3)] hover:scale-105 transition-all">
+                      Sign Up — Free
+                    </Button>
+                  </Link>
+                </>
+              ) : (
                 <div className="flex items-center gap-4">
                   <Link href="/dashboard">
                     <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-white/5 px-4 font-bold text-xs">
@@ -89,7 +91,7 @@ export function Navbar() {
                   </Link>
                   <UserButton afterSignOutUrl="/" />
                 </div>
-              </SignedIn>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -122,7 +124,8 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
-                <SignedIn>
+
+                {isSignedIn ? (
                   <Link
                     href="/dashboard"
                     onClick={() => setIsOpen(false)}
@@ -130,20 +133,20 @@ export function Navbar() {
                   >
                     Go to Dashboard
                   </Link>
-                </SignedIn>
-                
-                <SignedOut>
-                  <Link href="/sign-in" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 rounded-full mt-2">
-                      Log In
-                    </Button>
-                  </Link>
-                  <Link href="/sign-up" onClick={() => setIsOpen(false)}>
-                    <Button variant="gradient" className="w-full rounded-full mt-2">
-                      Get Started
-                    </Button>
-                  </Link>
-                </SignedOut>
+                ) : (
+                  <>
+                    <Link href="/sign-in" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 rounded-full mt-2">
+                        Log In
+                      </Button>
+                    </Link>
+                    <Link href="/sign-up" onClick={() => setIsOpen(false)}>
+                      <Button variant="gradient" className="w-full rounded-full mt-2">
+                        Sign Up — Free
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </motion.div>
           )}

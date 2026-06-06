@@ -7,22 +7,22 @@ export default function RefundPolicy() {
       <div className="space-y-6 text-gray-300 leading-relaxed">
         <p className="text-sm text-gray-500">Last updated: {new Date().toLocaleDateString()}</p>
         
-        <h2 className="text-2xl font-semibold text-white mt-8">1. Digital Services Nature</h2>
-        <p>Since ClawSetup AI provides digital and automated setup services (execution of deployment scripts), our refund policy is strictly defined. Once a deployment has been successfully completed on your VPS, we generally do not offer refunds due to the irreversible nature of server configuration work.</p>
+        <h2 className="text-2xl font-semibold text-white mt-8">1. Free Public Beta</h2>
+        <p>ClawSetup AI is currently in a 100% Free Public Beta. No payment is required to use the service. As there are no charges, traditional monetary refunds are not applicable during this period.</p>
         
-        <h2 className="text-2xl font-semibold text-white mt-8">2. Eligible Refunds (Failed Deployments)</h2>
-        <p>If our automated system fails to deploy the software on your provided VPS due to an error on our end or a bug in our script, and our support team cannot resolve it within 48 hours, you are entitled to a full refund.</p>
+        <h2 className="text-2xl font-semibold text-white mt-8">2. Failed Deployments</h2>
+        <p>If our automated system fails to deploy OpenClaw on your provided VPS due to a bug in our script or an error on our end, and our support team cannot resolve it within 48 hours, we will prioritize re-running your deployment at no cost.</p>
         
-        <h2 className="text-2xl font-semibold text-white mt-8">3. Non-Refundable Situations (User Errors)</h2>
-        <p>Refunds will not be issued under the following circumstances:</p>
+        <h2 className="text-2xl font-semibold text-white mt-8">3. User Errors</h2>
+        <p>Support assistance cannot be guaranteed under the following circumstances:</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>The deployment fails due to incorrect VPS credentials provided by the user.</li>
-          <li>The provided server does not meet the minimum hardware or OS requirements.</li>
-          <li>The user decides to cancel the service after the deployment process has already initiated or completed.</li>
+          <li>The provided server does not meet the minimum hardware or OS requirements (Ubuntu 22.04+, 2 vCPU, 2GB RAM).</li>
+          <li>The user's VPS provider blocks outbound connections required during installation.</li>
         </ul>
         
-        <h2 className="text-2xl font-semibold text-white mt-8">4. How to Request a Refund</h2>
-        <p>To request a refund under the eligible conditions, please contact our support team. Make sure to provide your Gumroad purchase receipt and the exact error or issue you are facing.</p>
+        <h2 className="text-2xl font-semibold text-white mt-8">4. How to Get Support</h2>
+        <p>If your deployment fails or you have an issue, please contact our support team with your registered email address and the deployment log output from your dashboard. We'll investigate and re-run the deployment if necessary.</p>
       </div>
     </div>
   );

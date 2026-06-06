@@ -13,8 +13,11 @@ export default async function DashboardPage() {
   // 1. Fetch deployments list (Always show only the logged-in user's personal orders here)
   const orders = await getOrders(userEmail)
 
-  // 2. Fetch active subscription details for quota progress calculation
-  const subscription = await getSubscription(userEmail)
+  // 2. Fetch active subscription details (Mocked to free beta)
+  const subscription = {
+    plan: "free",
+    status: "active",
+  }
 
   return (
     <DashboardClient 

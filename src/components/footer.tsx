@@ -11,14 +11,14 @@ const footerLinks = {
     { label: "Order Now", href: "/order" },
   ],
   company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "About OpenClaw", href: "https://github.com/openclaw/openclaw" },
+    { label: "Features", href: "#features" },
+    { label: "Contact Support", href: "mailto:support@clawsetup.ai" },
   ],
   support: [
     { label: "FAQ", href: "#faq" },
-    { label: "Documentation", href: "#" },
-    { label: "Status", href: "#" },
+    { label: "GitHub Repo", href: "https://github.com/openclaw/openclaw" },
+    { label: "WhatsApp Chat", href: `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ''}` },
   ],
   legal: [
     { label: "Terms of Service", href: "/terms-and-conditions" },
@@ -141,10 +141,10 @@ export function Footer() {
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col items-center md:items-start gap-2">
             <p className="text-xs text-zinc-500 font-bold uppercase tracking-[0.2em]">
-              &copy; {currentYear} ClawSetup AI. The World&apos;s #1 AI Deployment Platform.
+              &copy; {currentYear} ClawSetup AI. Automated Node Orchestration.
             </p>
             <p className="text-[10px] text-zinc-600 font-medium">
-              Enterprise Grade Security & Automated Infrastructure for OpenClaw.
+              AES-256 Encrypted Credentials & Secure VPS Deployments.
             </p>
           </div>
           

@@ -11,27 +11,27 @@ import {
 const faqs = [
   {
     question: "What is included in the setup service?",
-    answer: "Our setup service includes complete installation and configuration of the OpenClaw AI assistant on your VPS, security hardening with firewall rules and SSL certificates, dependency installation, performance optimization, and thorough testing to ensure everything works perfectly.",
+    answer: "Our automated system performs complete installation and configuration of the OpenClaw AI assistant on your VPS, configures an Nginx reverse proxy with SSL certificates, secures the server with UFW firewall hardening, and runs optimization checks for peak AI inference performance.",
   },
   {
     question: "Which VPS providers do you support?",
-    answer: "We support all major VPS providers including DigitalOcean, Linode, Vultr, AWS EC2, Google Cloud Platform, Azure, and any other provider that offers Ubuntu or Debian-based servers with SSH access.",
+    answer: "We support any provider offering clean Ubuntu 22.04 LTS servers with root SSH access, including DigitalOcean, Linode, Vultr, Hetzner, AWS, GCP, and Azure.",
   },
   {
     question: "How long does the setup take?",
-    answer: "Most setups are completed within 12-24 hours of receiving your order. The Starter plan has a 48-hour guarantee, while Pro and higher plans have a 24-hour delivery guarantee. Complex custom configurations may take slightly longer.",
+    answer: "It takes under 5 minutes. The deployment is fully automated via safe SSH scripting. You can watch the exact execution steps in real-time through the deployment logs terminal on your dashboard.",
   },
   {
-    question: "Is my OpenAI API key secure?",
-    answer: "Absolutely. Your API key is handled with the highest security standards. We use encrypted storage, secure transmission protocols, and the key is only used during the setup process. We never store keys in plain text or share them with third parties.",
+    question: "Is my OpenAI/provider API key secure?",
+    answer: "Absolutely. Your API keys and VPS password are encrypted using AES-256-GCM before being saved to the database. They are only decrypted in memory during the 5-minute setup process and are never stored in plain text.",
   },
   {
-    question: "What if I'm not satisfied with the setup?",
-    answer: "We offer a 30-day money-back guarantee on all our services. If you're not completely satisfied with the setup, contact us and we'll either fix the issues or provide a full refund.",
+    question: "What if the setup fails or I am not satisfied?",
+    answer: "We offer a 7-day money-back guarantee. If our script fails to deploy on your VPS or you are not satisfied with the orchestration, contact us via WhatsApp or email for a full refund.",
   },
   {
-    question: "Do you provide ongoing support?",
-    answer: "Yes! Our Monthly Support plan includes ongoing maintenance, security updates, performance monitoring, and priority support. You can also reach out to us anytime via WhatsApp for quick questions.",
+    question: "Is there a cost to use ClawSetup?",
+    answer: "No. ClawSetup is currently in a 100% Free Public Beta. You can deploy and manage up to 5 concurrent OpenClaw AI assistant nodes on your own VPS servers completely free of charge. No payment card is required.",
   },
 ]
 

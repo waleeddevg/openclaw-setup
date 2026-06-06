@@ -62,26 +62,27 @@ export function DeploymentProgress({ orderId }: DeploymentProgressProps) {
 
   const logs = order.deployment_logs || []
   const status = order.status
-  const isPaid = order.payment_status === 'paid'
+  // Free Beta: treat all orders as active regardless of payment_status
+  const isActive = status === 'in_progress' || status === 'completed' || logs.length > 0
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Payment Warning - If not paid */}
-      {!isPaid && (
-        <motion.div 
+      {/* Queued state — order submitted but deployment not started yet */}
+      {status === 'pending' && (
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl flex items-center gap-4"
+          className="p-4 bg-violet-500/10 border border-violet-500/20 rounded-xl flex items-center gap-4"
         >
-          <div className="h-10 w-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-yellow-500" />
+          <div className="h-10 w-10 rounded-full bg-violet-500/20 flex items-center justify-center">
+            <Loader2 className="h-5 w-5 animate-spin text-violet-400" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-yellow-500 uppercase tracking-wider">Awaiting Payment Confirmation</h4>
-            <p className="text-xs text-zinc-400">Deployment will begin automatically once Lemon Squeezy confirms your transaction.</p>
+            <h4 className="text-sm font-semibold text-violet-400 uppercase tracking-wider">Order Received</h4>
+            <p className="text-xs text-zinc-400">Your setup request is queued. An admin will trigger your deployment shortly.</p>
           </div>
-          <Button size="sm" variant="outline" className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10" onClick={() => window.location.reload()}>
-            Refresh Status
+          <Button size="sm" variant="outline" className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10" onClick={() => window.location.reload()}>
+            Refresh
           </Button>
         </motion.div>
       )}
@@ -127,29 +128,29 @@ export function DeploymentProgress({ orderId }: DeploymentProgressProps) {
             <div className="relative">
               <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-zinc-800" />
               <div className="space-y-8">
-                <StepItem 
-                  title="Cloud Environment Validation" 
+                <StepItem
+                  title="Cloud Environment Validation"
                   description="Verifying VPS accessibility and security keys"
-                  isCompleted={logs.some((l: string) => l.includes('Connected'))} 
-                  isActive={isPaid && status === 'in_progress' && !logs.some((l: string) => l.includes('Connected'))} 
+                  isCompleted={logs.some((l: string) => l.includes('Connected'))}
+                  isActive={isActive && status === 'in_progress' && !logs.some((l: string) => l.includes('Connected'))}
                 />
-                <StepItem 
-                  title="Core Dependencies Installation" 
+                <StepItem
+                  title="Core Dependencies Installation"
                   description="Setting up Node.js 22, Docker, and system packages"
-                  isCompleted={logs.some((l: string) => l.includes('Node.js 22'))} 
-                  isActive={logs.some((l: string) => l.includes('Connected')) && !logs.some((l: string) => l.includes('Node.js 22'))} 
+                  isCompleted={logs.some((l: string) => l.includes('Node.js 22'))}
+                  isActive={logs.some((l: string) => l.includes('Connected')) && !logs.some((l: string) => l.includes('Node.js 22'))}
                 />
-                <StepItem 
-                  title="Source Code Deployment" 
+                <StepItem
+                  title="Source Code Deployment"
                   description="Cloning OpenClaw repository and configuring gateway"
-                  isCompleted={logs.some((l: string) => l.includes('Cloning'))} 
-                  isActive={logs.some((l: string) => l.includes('Node.js 22')) && !logs.some((l: string) => l.includes('Cloning'))} 
+                  isCompleted={logs.some((l: string) => l.includes('Cloning'))}
+                  isActive={logs.some((l: string) => l.includes('Node.js 22')) && !logs.some((l: string) => l.includes('Cloning'))}
                 />
-                <StepItem 
-                  title="Final System Optimization" 
+                <StepItem
+                  title="Final System Optimization"
                   description="Applying security hardening and launching service"
-                  isCompleted={status === 'completed'} 
-                  isActive={logs.some((l: string) => l.includes('Cloning')) && status !== 'completed'} 
+                  isCompleted={status === 'completed'}
+                  isActive={logs.some((l: string) => l.includes('Cloning')) && status !== 'completed'}
                 />
               </div>
             </div>

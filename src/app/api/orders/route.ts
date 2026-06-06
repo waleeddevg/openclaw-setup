@@ -42,21 +42,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 1. Check user subscription details
-    const subscription = await getSubscription(userEmail)
-    if (!subscription || subscription.status !== "active") {
-      return NextResponse.json(
-        { error: "No active subscription found. Please subscribe to a plan in the pricing section to host nodes." },
-        { status: 403 }
-      )
+    // 1. Free Beta Tier (No paid subscription required)
+    const subscription = {
+      status: "active",
+      plan: "free",
     }
 
     const limits: Record<string, number> = {
-      basic: 1,
-      pro: 3,
-      business: 10,
+      free: 5,
     }
-    const maxNodes = limits[subscription.plan] || 0
+    const maxNodes = limits[subscription.plan] || 5
 
     // 2. Count current active nodes (pending, in_progress, or completed)
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -110,9 +105,10 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
+      // Log full error server-side, never expose DB internals to client
       console.error("Database error details:", error)
       return NextResponse.json(
-        { error: `Database error: ${error.message || "Unknown error"}`, details: error },
+        { error: "Failed to create order. Please try again or contact support." },
         { status: 500 }
       )
     }

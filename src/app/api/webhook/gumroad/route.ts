@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createHmac, timingSafeEqual } from "crypto";
 
 // Initialize Supabase Client (Service Role for admin bypass)
 const supabaseAdmin = createClient(
@@ -7,26 +8,52 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+/**
+ * Verify Gumroad webhook signature.
+ * Gumroad signs payloads with HMAC-SHA256 using your webhook secret.
+ * Uses timingSafeEqual to prevent timing attacks.
+ */
+function verifyGumroadSignature(rawBody: string, signature: string, secret: string): boolean {
+  if (!signature) return false;
+  const hash = createHmac("sha256", secret).update(rawBody).digest("hex");
+  const hashBuffer = Buffer.from(hash, "hex");
+  const sigBuffer = Buffer.from(signature, "hex");
+  if (hashBuffer.length !== sigBuffer.length) return false;
+  return timingSafeEqual(hashBuffer, sigBuffer);
+}
+
 export async function POST(request: NextRequest) {
   try {
+    const rawBody = await request.text();
+    const signature = request.headers.get("x-gumroad-signature") || "";
+    const webhookSecret = process.env.GUMROAD_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.error("[Gumroad Webhook] Missing GUMROAD_WEBHOOK_SECRET env var");
+      return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+    }
+
+    if (!verifyGumroadSignature(rawBody, signature, webhookSecret)) {
+      console.warn("[Gumroad Webhook] Invalid signature — possible spoofed request");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
     // Gumroad sends data as form-urlencoded
-    const formData = await request.formData();
+    const formData = new URLSearchParams(rawBody);
     
     // Extract Gumroad payment details
     const email = formData.get("email") as string;
     const price = formData.get("price") as string;
-    const customUserId = formData.get("custom_user_id") as string; // Yeh humne checkout me bheja tha
+    const customUserId = formData.get("custom_user_id") as string;
     const orderNumber = formData.get("order_number") as string;
     
-    console.log(`Gumroad Webhook Received: Order ${orderNumber} for ${email}`);
+    console.log(`[Gumroad Webhook] Order ${orderNumber} for ${email}`);
 
     if (!customUserId) {
-      console.error("Missing custom_user_id from Gumroad webhook");
+      console.error("[Gumroad Webhook] Missing custom_user_id");
       return NextResponse.json({ error: "Missing custom_user_id" }, { status: 400 });
     }
 
-    // Step 1: User ki current order/subscription ko dhoondho aur usko "paid" / "active" karo
-    // Yahan apni database schema ke mutabiq table ka naam dein (jaise 'orders' ya 'subscriptions')
     const { error: dbError } = await supabaseAdmin
       .from('orders')
       .update({ 
@@ -38,20 +65,17 @@ export async function POST(request: NextRequest) {
       .eq('status', 'pending');
 
     if (dbError) {
-      console.error("Database update error:", dbError);
+      console.error("[Gumroad Webhook] Database update error:", dbError);
       return NextResponse.json({ error: "Database update failed" }, { status: 500 });
     }
 
-    // Step 2: (Optional) Agar auto-deploy script yahan chalani hai toh webhook ya queue trigger kar sakte hain
-    // example: triggerDeployment(customUserId);
-
-    console.log(`Successfully processed Gumroad payment for user ${customUserId}`);
+    console.log(`[Gumroad Webhook] ✅ Successfully processed payment for user ${customUserId}`);
     
-    // Gumroad ko 200 OK dena zaroori hai
+    // Gumroad expects 200 OK
     return NextResponse.json({ success: true }, { status: 200 });
     
   } catch (error: any) {
-    console.error("Gumroad webhook error:", error);
+    console.error("[Gumroad Webhook] Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

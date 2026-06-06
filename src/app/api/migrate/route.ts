@@ -1,10 +1,22 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { currentUser } from "@clerk/nextjs/server"
+import { isAdmin } from "@/lib/auth"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export async function GET() {
+  // Protect this endpoint — it can execute DDL on the production database
+  const user = await currentUser()
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  const admin = await isAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 })
+  }
+
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 

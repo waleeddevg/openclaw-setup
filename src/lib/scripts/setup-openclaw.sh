@@ -2,19 +2,25 @@
 
 # OpenClaw AI Auto-Setup Script
 # Purpose: Full automation for ClawSetup AI
-# Variables are read from arguments
+# Variables are injected as environment variables by the deployment service
+# Do NOT pass these as shell arguments — they are set via 'export' before this script runs
 
 set -e # Exit on error
 
-# Variables from arguments
-API_KEY="$1"
-VPS_IP="$2"
-PROVIDER="$3"
-
-if [ -z "$API_KEY" ]; then
-    echo "ERROR: API_KEY is not set."
+# Validate required env vars
+if [ -z "$CLAWSETUP_API_KEY" ]; then
+    echo "ERROR: CLAWSETUP_API_KEY is not set."
     exit 1
 fi
+
+if [ -z "$CLAWSETUP_PROVIDER" ]; then
+    CLAWSETUP_PROVIDER="openai"
+fi
+
+# Alias to shorter names for readability
+API_KEY="$CLAWSETUP_API_KEY"
+VPS_IP="$CLAWSETUP_VPS_IP"
+PROVIDER="$CLAWSETUP_PROVIDER"
 
 echo "Starting OpenClaw AI Setup for Provider: $PROVIDER..."
 
